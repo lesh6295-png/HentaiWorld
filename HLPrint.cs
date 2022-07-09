@@ -12,12 +12,26 @@ namespace HentaiWorld
     static class HLPrint
     {
         static DateTime startupTime;
+        public static byte LogLevel { get; private set; }
+
+
         static HLPrint()
         {
             startupTime = DateTime.Now;
+            LogLevel = 63;
         }
-        public static void Print(string s, bool newLine = false)
+        /// <summary>
+        /// DONT CALL THIS METHOD, HE USING ONLY ONE TIMES IN Params CLASS
+        /// </summary>
+        /// <param name="level"></param>
+        public static void SetLogLevel(byte level)
         {
+            LogLevel = level;
+        }
+        public static void Print(string s, bool newLine = true, byte messageLevel = 63)
+        {
+            if (messageLevel > LogLevel)
+                return;
             if (newLine)
             {
                 Console.WriteLine(s.ToPrint());
@@ -25,13 +39,17 @@ namespace HentaiWorld
             }
             Console.Write(s.ToPrint());
         }
-        public static void Print(string s, ConsoleColor color, bool newLine = false)
+        public static void Print(string s, ConsoleColor color, bool newLine = true, byte messageLevel = 63)
         {
+            if (messageLevel > LogLevel)
+                return;
+
             ConsoleColor last = Console.ForegroundColor;
             Console.ForegroundColor = color;
             if (newLine)
             {
                 Console.WriteLine(s.ToPrint());
+                Console.ForegroundColor = last;
                 return;
             }
             Console.Write(s.ToPrint());
@@ -40,6 +58,10 @@ namespace HentaiWorld
         public static string ReadLine()
         {
             return Console.ReadLine();
+        }
+        public static string GetUptime()
+        {
+            return (DateTime.Now - startupTime).ToString();
         }
         public static string ToPrint(this string s)
         {

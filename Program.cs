@@ -6,7 +6,11 @@ namespace HentaiWorld
     {
         static void Main(string[] args)
         {
-            HLPrint.Print("Hentai World Server", true);
+            Params.ProcessArgs(args);
+            Server s = new Server();
+            HLPrint.Print("Hentai World Server");
+            s.TryToEnable();
+            s.StartServer();
             HLPrint.ReadLine();
         }
     }
