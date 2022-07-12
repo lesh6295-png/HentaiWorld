@@ -1,0 +1,8 @@
+﻿~ this is comment
+~ pageId pathToPage canProcessInHtmlProcess processID
+404error 404fobridden.html false -1
+about about.html true 1
+noprefix blank.html false -1
+qr QRlink.html true 2
+find FindPage.html true 3
+sample SampleResult.html false -1

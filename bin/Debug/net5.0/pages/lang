@@ -1,0 +1,21 @@
+﻿~ comment
+~ this is localization file
+~ keys on html pages convert on valves from this files
+~ language codes on ISO-639 standart
+~ file must define at least one language
+USE_LANGS en ru
+~ this files contains localization to english and russian
+~ USE_LANGS en jp de - this contains locales to english, japanese and deutsch langs
+###find_d en:Enter tags of what you want to see(Explame: 1girl, 2boys, Evangelion). So, not all sources containts tags @@@ ru:Введите теги того, что вы хотите увидеть(Пример: 1girl, 2boys, Evangelion). Теги НЕ переводятся, так же есть несколько источников без тегов. @@@
+~ key_name lang_code:text @@@ lang_code:text @@@
+~ @@@ sprit valves
+~ for explame
+~ ###first_letter_of_alfabet en:a @@@ jp:あ @@@ de:a @@@
+###input_filed en:Enter tags @@@ ru:Введите теги @@@
+###find_but en:Find @@@ ru:Поиск @@@
+
+
+
+
+
+~ if you can help with translate, just open a issuse, where type language, he code and translate for all keys. Translate can contains micstakes:( Thanks you!

@@ -14,13 +14,17 @@ namespace HentaiWorld
         Dictionary<string, string> images = new Dictionary<string, string>();
 
         List<HtmlProcess> pageProcess = new List<HtmlProcess>();
+
+        LangLoader lang = new LangLoader();
         public LoaderPages()
         {
             pageProcess.Add(new AboutProcess());
+            pageProcess.Add(new QRProcess());
+            pageProcess.Add(new FindProcess(lang));
         }
         public string ProcessPage(string page, int id, object other)
         {
-            foreach(HtmlProcess hp in pageProcess)
+            foreach (HtmlProcess hp in pageProcess)
             {
                 string outp = hp.ChangeValves(page, id, other);
                 if (outp != "bt")
@@ -31,16 +35,16 @@ namespace HentaiWorld
         }
         public void TryLoadPages()
         {
-            HLPrint.Print("Try load pages from drive...", messageLevel:63);
+            HLPrint.Print("Try load pages from drive...", messageLevel: 63);
             try
             {
                 string[] pagesLib = File.ReadAllLines($"{folderWithPages}pages");
-                foreach(string line in pagesLib)
+                foreach (string line in pagesLib)
                 {
                     string[] words = line.Split(' ');
 
                     //check if line a comment
-                    if(words[0][0] == '~')
+                    if (words[0][0] == '~')
                     {
                         HLPrint.Print("comment in page file", messageLevel: 255);
                         continue;
@@ -48,17 +52,17 @@ namespace HentaiWorld
                     Page p = Page.Empry;
                     p.page = File.ReadAllText(folderWithPages + words[1]);
                     p.canProcess = Convert.ToBoolean(words[2]);
-                    if(p.canProcess == true)
+                    if (p.canProcess == true)
                         p.processId = Convert.ToInt32(words[3]);
                     pages.Add(words[0], p);
 
                     HLPrint.Print($"{words[0]} | {words[1]} - page pair", messageLevel: 127);
                 }
-                HLPrint.Print("Pages loaded sussesful!", ConsoleColor.Green, messageLevel:63);
+                HLPrint.Print($"Pages loaded sussesful!, {pages.Count} pages loaded.", ConsoleColor.Green, messageLevel: 63);
             }
-            catch( Exception ex)
+            catch (Exception ex)
             {
-                HLPrint.Print($"Load pages falied: {ex.Message}", ConsoleColor.Red, messageLevel:7);
+                HLPrint.Print($"Load pages falied: {ex.Message}", ConsoleColor.Red, messageLevel: 7);
             }
         }
         public void TryLoadImages()
@@ -74,17 +78,29 @@ namespace HentaiWorld
                     //check if line a comment
                     if (words[0][0] == '~')
                     {
-                        HLPrint.Print("comment in image file",  messageLevel: 255);
+                        HLPrint.Print("comment in image file", messageLevel: 255);
                         continue;
                     }
                     images.Add(words[0], words[1]);
                     HLPrint.Print($"{words[0]} | {words[1]} - image pair", messageLevel: 127);
                 }
-                HLPrint.Print("Images checking sussesful!", ConsoleColor.Green, messageLevel: 63);
+                HLPrint.Print($"Images checking sussesful!, {images.Count} images checking.", ConsoleColor.Green, messageLevel: 63);
             }
             catch (Exception ex)
             {
-                HLPrint.Print($"Check images falied: {ex.Message}", ConsoleColor.Red, messageLevel:7);
+                HLPrint.Print($"Check images falied: {ex.Message}", ConsoleColor.Red, messageLevel: 7);
+            }
+        }
+        public void TryLoadLocales()
+        {
+            HLPrint.Print("Try load locales...", messageLevel: 63);
+            try
+            {
+                lang.LoadLangs(gaptpf() + "/pages/lang");
+            }
+            catch (Exception ex)
+            {
+                HLPrint.Print($"Load locales falied: {ex.Message}", ConsoleColor.Red, messageLevel: 7);
             }
         }
         public Page GetPage(string pageKey)
@@ -95,14 +111,16 @@ namespace HentaiWorld
         {
             HLPrint.Print("Start registring prefix", messageLevel: 127);
             //add pages
-            foreach(var q in pages.Keys)
+            foreach (var q in pages.Keys)
             {
                 hl.Prefixes.Add($"http://{Params.ipPrefix}:{Params.port}/pages/{q}/");
             }
 
             // add image prefix
             hl.Prefixes.Add($"http://{Params.ipPrefix}:{Params.port}/pages/img/");
-            
+
+            // add blank prefix
+            hl.Prefixes.Add($"http://{Params.ipPrefix}:{Params.port}/");
         }
         public byte[] LoadImageInMemory(string imageKey)
         {

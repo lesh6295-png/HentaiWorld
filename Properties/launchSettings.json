@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HentaiWorld": {
+      "commandName": "Project",
+      "commandLineArgs": "-enableNgrok -loglevel 255"
+    }
+  }
+}

@@ -12,15 +12,20 @@ namespace HentaiWorld
         LoaderPages loaderPages;
 
         HttpListener http;
+
+        NgrokTunnel tun;
         public Server()
         {
             loaderPages = new LoaderPages();
             http = new HttpListener();
+            if(Params.NgrokTunnel)
+            tun = new ();
         }
         public void TryToEnable()
         {
             HLPrint.Print("Server trying to load components");
             loaderPages.TryLoadPages();
+            loaderPages.TryLoadLocales();
             loaderPages.TryLoadImages();
             loaderPages.AddPrefix(http);
             HLPrint.Print($"Public IP address is {SIP.GetPublicIP()}:{Params.port}, everyone can connect from you with this address. Check your brandmauer and open port to input connections if your cant connect to server from another device.", ConsoleColor.Yellow, messageLevel: 15);
@@ -28,6 +33,7 @@ namespace HentaiWorld
         public void StartServer()
         {
             http.Start();
+            
             while (true)
             {
                 var clb = http.BeginGetContext(new AsyncCallback(ClientProcess), http);
@@ -43,6 +49,14 @@ namespace HentaiWorld
             var context = list.EndGetContext(result);
             Uri url = context.Request.Url;
             string pageToGet = url.ToString().Split('/', StringSplitOptions.RemoveEmptyEntries).Last();
+
+            //check if request containts GET data
+            if (pageToGet.Contains("="))
+            {
+                var urlbuf = pageToGet.ToString().Split('?', StringSplitOptions.RemoveEmptyEntries);
+                pageToGet = urlbuf[0];
+            }
+
             HLPrint.Print(url.ToString(), ConsoleColor.Cyan, messageLevel:127);
             HLPrint.Print($"Client {url.UserInfo}, ip: {context.Request.RemoteEndPoint}", ConsoleColor.Cyan, messageLevel: 63);
             byte[] buffer;
@@ -51,7 +65,7 @@ namespace HentaiWorld
                 HLPrint.Print("Image responce",ConsoleColor.DarkCyan, messageLevel: 127);
                 buffer = (loaderPages.LoadImageInMemory(pageToGet));
             }
-            else
+            else if(url.ToString().Contains("/pages/"))
             {
                 HLPrint.Print("Page responce", ConsoleColor.DarkCyan, messageLevel: 127);
                 Page page = loaderPages.GetPage(pageToGet);
@@ -59,6 +73,11 @@ namespace HentaiWorld
                 if (page.canProcess)
                     finalPage = loaderPages.ProcessPage(page.page, page.processId, context);
                 buffer = Encoding.UTF8.GetBytes(finalPage);
+            }
+            else
+            {
+                HLPrint.Print("Blank page open", ConsoleColor.DarkCyan, messageLevel: 127);
+                buffer = Encoding.UTF8.GetBytes(loaderPages.GetPage("noprefix").page);
             }
 
 
